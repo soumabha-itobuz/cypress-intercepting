@@ -1,17 +1,23 @@
 import {} from 'cypress';
 
 describe('Image Request Interception', () => {
-    it('Intercept body', () => {
+  it('Intercept and log fetched data', () => {
+    
+    // Intercept the request
+    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/todos/1', (req) => {
+      // Handle the response after the request is made
+      req.reply((res) => {
+        console.log('Fetched data:', res.body);
         
-      // Intercept the request
-      cy.intercept('GET', 'http://localhost:4000', {
-        body: []
-      }).as('posts');
-  
-      // Visit the page
-      cy.visit('https://jsonplaceholder.typicode.com/posts');
-      cy.wait('posts').its('response.statusCode').should('not.eq',200);
-      
+        res.body.id = 4;
+        res.body.completed = true;
+        // res.body = [];
+        cy.log(res.body);
+        
+      });
     });
+    cy.visit('https://jsonplaceholder.typicode.com/');
+    cy.get('#run-button').click();
+    // cy.wait('@posts').its('response.body').should('have.length', 0); 
   });
-
+});
